@@ -5,7 +5,9 @@ def modify_data():
     df = pd.read_csv('data/dataset.csv')
 
     # Creating the new feature 'trip_duration' (in minutes)
-    df['trip_duration'] = (pd.to_datetime(df['tpep_dropoff_datetime']) - pd.to_datetime(df['tpep_pickup_datetime'])).dt.total_seconds() / 60.0
+    df['trip_duration'] = (
+            (pd.to_datetime(df['tpep_dropoff_datetime']) - pd.to_datetime(df['tpep_pickup_datetime']))
+            .dt.total_seconds() / 60.0)
 
     # Adding hour and weekday of departure
     df['pickup_hour'] = pd.to_datetime(df['tpep_pickup_datetime']).dt.hour
