@@ -84,7 +84,7 @@ if __name__ == "__main__":
     # TODO: ADD MAPE
 
     # Save the model as a pickle file
-    with open('catboost_model.pkl', 'wb') as file:
+    with open('models/catboost_model.pkl', 'wb') as file:
         pickle.dump(model, file)
 
     print("Model has been trained and saved as 'catboost_model.pkl'")

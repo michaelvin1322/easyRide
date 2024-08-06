@@ -5,3 +5,10 @@ stages:
     - extract_data.py
     outs:
     - data/dataset.csv
+  modify_data:
+    cmd: python modify_data.py
+    deps:
+    - data/raw_dataset.csv
+    - modify_data.py
+    outs:
+    - data/modified_dataset.csv
