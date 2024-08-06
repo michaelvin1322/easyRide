@@ -9,15 +9,21 @@ stages:
   modify_data:
     cmd: python training_pipeline/modify_data.py
     deps:
-    - data/raw_dataset.csv
+    - data/dataset.csv
     - training_pipeline/modify_data.py
     outs:
     - data/modified_dataset.csv
-
   train_model:
     cmd: python training_pipeline/train_model.py
     deps:
     - data/modified_dataset.csv
-    - train_model.py
+    - training_pipeline/train_model.py
     outs:
-    - models/
+    - models/catboost_model.pkl
+params:
+- dvclive/params.yaml
+metrics:
+- dvclive/metrics.json
+plots:
+- dvclive/plots/metrics:
+    x: step

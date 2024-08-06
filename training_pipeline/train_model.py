@@ -53,14 +53,11 @@ def train_model():
         live.log_metric("MAPE", mape)
         live.log_metric("MSE", mse)
         live.log_metric("r2", r2)
+        live.log_param("TimeStamp", datetime.now().strftime("%Y%m%d_%H%M"))
 
-    # Save the model as a pickle file
-    # Create a dynamic filename for the model
-    now = datetime.now()
-    timestamp = now.strftime("%Y%m%d_%H%M")
-    model_filename = f"catboost_model_{timestamp}.pkl"
+    model_filename = "catboost_model.pkl"
 
-    with open(f'models/{model_filename}.pkl', 'wb') as file:
+    with open(f'models/{model_filename}', 'wb') as file:
         pickle.dump(model, file)
 
     print("Model has been trained and saved as 'catboost_model.pkl'")
