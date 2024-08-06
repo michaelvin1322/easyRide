@@ -22,42 +22,44 @@ ORDER BY
 LIMIT 10
 """
 
-# Reading data from the database
-df = pd.read_sql(query, engine)
+if __name__ == "__main__":
 
-# Creating the new feature 'trip_duration' (in minutes)
-df['trip_duration'] = (pd.to_datetime(df['tpep_dropoff_datetime']) - pd.to_datetime(df['tpep_pickup_datetime'])).dt.total_seconds() / 60.0
+    # Reading data from the database
+    df = pd.read_sql(query, engine)
 
-# Adding hour and weekday of departure
-df['pickup_hour'] = pd.to_datetime(df['tpep_pickup_datetime']).dt.hour
-df['pickup_weekday'] = pd.to_datetime(df['tpep_pickup_datetime']).dt.weekday
+    # Creating the new feature 'trip_duration' (in minutes)
+    df['trip_duration'] = (pd.to_datetime(df['tpep_dropoff_datetime']) - pd.to_datetime(df['tpep_pickup_datetime'])).dt.total_seconds() / 60.0
 
-df['puborough'] = df['puborough'].astype('category').cat.codes
-df['puzone'] = df['puzone'].astype('category').cat.codes
-df['puservicezone'] = df['puservicezone'].astype('category').cat.codes
-df['doborough'] = df['doborough'].astype('category').cat.codes
-df['dozone'] = df['dozone'].astype('category').cat.codes
-df['doservicezone'] = df['doservicezone'].astype('category').cat.codes
+    # Adding hour and weekday of departure
+    df['pickup_hour'] = pd.to_datetime(df['tpep_pickup_datetime']).dt.hour
+    df['pickup_weekday'] = pd.to_datetime(df['tpep_pickup_datetime']).dt.weekday
 
-categorical_features = [
-    'puborough', 'puzone', 'puservicezone',
-    'doborough', 'dozone', 'doservicezone',
-    'pickup_hour', 'pickup_weekday'
-]
+    df['puborough'] = df['puborough'].astype('category').cat.codes
+    df['puzone'] = df['puzone'].astype('category').cat.codes
+    df['puservicezone'] = df['puservicezone'].astype('category').cat.codes
+    df['doborough'] = df['doborough'].astype('category').cat.codes
+    df['dozone'] = df['dozone'].astype('category').cat.codes
+    df['doservicezone'] = df['doservicezone'].astype('category').cat.codes
+
+    categorical_features = [
+        'puborough', 'puzone', 'puservicezone',
+        'doborough', 'dozone', 'doservicezone',
+        'pickup_hour', 'pickup_weekday'
+    ]
 
 
-for col in categorical_features:
-    df[col] = df[col].astype(str)
+    for col in categorical_features:
+        df[col] = df[col].astype(str)
 
-columns_to_keep = [
-    'trip_distance', 'puborough', 'puzone', 'puservicezone',
-    'doborough', 'dozone', 'doservicezone', 'pickup_hour',
-    'pickup_weekday', 'pickup_hour', 'pickup_weekday',
-    'trip_duration'
-]
-df = df[columns_to_keep]
+    columns_to_keep = [
+        'trip_distance', 'puborough', 'puzone', 'puservicezone',
+        'doborough', 'dozone', 'doservicezone', 'pickup_hour',
+        'pickup_weekday', 'pickup_hour', 'pickup_weekday',
+        'trip_duration'
+    ]
+    df = df[columns_to_keep]
 
-# Save the DataFrame to a CSV file
-df.to_csv('sample_data.csv', index=False)
+    # Save the DataFrame to a CSV file
+    df.to_csv('sample_data.csv', index=False)
 
-print("Sample data has been saved to 'sample_data.csv'")
+    print("Sample data has been saved to 'sample_data.csv'")
