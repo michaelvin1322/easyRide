@@ -1,16 +1,16 @@
 stages:
   extract_data:
-    cmd: python extract_data.py
+    cmd: python training_pipeline/extract_data.py
     deps:
-    - extract_data.py
+    - training_pipeline/extract_data.py
     outs:
     - data/dataset.csv
 
   modify_data:
-    cmd: python modify_data.py
+    cmd: python training_pipeline/modify_data.py
     deps:
     - data/raw_dataset.csv
-    - modify_data.py
+    - training_pipeline/modify_data.py
     outs:
     - data/modified_dataset.csv
 
