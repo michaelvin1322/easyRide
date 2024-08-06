@@ -5,6 +5,7 @@ stages:
     - extract_data.py
     outs:
     - data/dataset.csv
+
   modify_data:
     cmd: python modify_data.py
     deps:
@@ -12,3 +13,11 @@ stages:
     - modify_data.py
     outs:
     - data/modified_dataset.csv
+
+  train_model:
+    cmd: python training_pipeline/train_model.py
+    deps:
+    - data/modified_dataset.csv
+    - train_model.py
+    outs:
+    - models/
