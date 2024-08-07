@@ -1,0 +1,46 @@
+schema: '2.0'
+stages:
+  extract_data:
+    cmd: python training_pipeline/extract_data.py
+    deps:
+    - path: training_pipeline/extract_data.py
+      hash: md5
+      md5: 61c9038f843bb445591f55b160cfe702
+      size: 1547
+    outs:
+    - path: data/dataset.csv
+      hash: md5
+      md5: e15899f14cef21263dbadf2e7d18d619
+      size: 17507396
+  modify_data:
+    cmd: python training_pipeline/modify_data.py
+    deps:
+    - path: data/dataset.csv
+      hash: md5
+      md5: e15899f14cef21263dbadf2e7d18d619
+      size: 17507396
+    - path: training_pipeline/modify_data.py
+      hash: md5
+      md5: 7b06ddb2dae2f5442cc6c28044e4ddd5
+      size: 1996
+    outs:
+    - path: data/modified_dataset.csv
+      hash: md5
+      md5: d99f8c534592cd70f24b11f026721f55
+      size: 2955602
+  train_model:
+    cmd: python training_pipeline/train_model.py
+    deps:
+    - path: data/modified_dataset.csv
+      hash: md5
+      md5: d99f8c534592cd70f24b11f026721f55
+      size: 2955602
+    - path: training_pipeline/train_model.py
+      hash: md5
+      md5: e9b630a34a3526cd91b0e7b16a114526
+      size: 2378
+    outs:
+    - path: models/catboost_model.pkl
+      hash: md5
+      md5: 78ac91c79037cdd1b15105df12e105a9
+      size: 91175265

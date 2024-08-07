@@ -33,7 +33,7 @@ _model = None
 def get_model():
     global _model
     if _model is None:
-        with open("catboost_model.pkl", "rb") as f:
+        with open("models/catboost_model.pkl", "rb") as f:
             _model = pickle.load(f)
     return _model
 

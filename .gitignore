@@ -163,4 +163,10 @@ cython_debug/
 
 *.pkl
 
+data/*
+models/*
+
 catboost_info/
+
+!data/.gitkeep
+!models/.gitkeep
