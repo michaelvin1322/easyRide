@@ -13,6 +13,7 @@ stages:
     - training_pipeline/modify_data.py
     outs:
     - data/modified_dataset.csv
+
   train_model:
     cmd: python training_pipeline/train_model.py
     deps:
@@ -20,6 +21,7 @@ stages:
     - training_pipeline/train_model.py
     outs:
     - models/catboost_model.pkl
+
 params:
 - dvclive/params.yaml
 metrics:

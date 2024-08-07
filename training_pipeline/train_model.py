@@ -45,7 +45,14 @@ def train_model():
     # Calculate and print accuracy and determination coefficient
     mse = mean_squared_error(y_test, y_pred)
     r2 = r2_score(y_test, y_pred)
-    mape = mean_absolute_percentage_error(y_test, y_pred)
+
+    # Filter out small actual values to avoid large MAPE
+    threshold = 0.1  # Define your own threshold
+    mask = y_test > threshold
+    y_test_filtered = y_test[mask]
+    y_pred_filtered = y_pred[mask]
+
+    mape = mean_absolute_percentage_error(y_test_filtered, y_pred_filtered)
     # print(f"Mean Squared Error: {mse}")
     # print(f"R^2 Score: {r2}")
     # DONE: ADD MAPE
