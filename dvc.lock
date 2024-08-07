@@ -5,42 +5,42 @@ stages:
     deps:
     - path: training_pipeline/extract_data.py
       hash: md5
-      md5: fad21a9593fa3c7e286ca2993c57077a
-      size: 1481
+      md5: 61c9038f843bb445591f55b160cfe702
+      size: 1547
     outs:
     - path: data/dataset.csv
       hash: md5
-      md5: 17c366a4bff6988415125ad5088f8266
+      md5: e15899f14cef21263dbadf2e7d18d619
       size: 17507396
   modify_data:
     cmd: python training_pipeline/modify_data.py
     deps:
     - path: data/dataset.csv
       hash: md5
-      md5: 17c366a4bff6988415125ad5088f8266
+      md5: e15899f14cef21263dbadf2e7d18d619
       size: 17507396
     - path: training_pipeline/modify_data.py
       hash: md5
-      md5: 3e88ea68eab20a85244ee2a51db69f07
-      size: 1862
+      md5: 7b06ddb2dae2f5442cc6c28044e4ddd5
+      size: 1996
     outs:
     - path: data/modified_dataset.csv
       hash: md5
-      md5: eec5bc74d07c1a6fef4ba92c18271eb5
-      size: 2956908
+      md5: d99f8c534592cd70f24b11f026721f55
+      size: 2955602
   train_model:
     cmd: python training_pipeline/train_model.py
     deps:
     - path: data/modified_dataset.csv
       hash: md5
-      md5: eec5bc74d07c1a6fef4ba92c18271eb5
-      size: 2956908
+      md5: d99f8c534592cd70f24b11f026721f55
+      size: 2955602
     - path: training_pipeline/train_model.py
       hash: md5
-      md5: ada7450faecae79dd5aea3803dbad282
-      size: 2234
+      md5: e9b630a34a3526cd91b0e7b16a114526
+      size: 2378
     outs:
     - path: models/catboost_model.pkl
       hash: md5
-      md5: b808f26d616eb36521d2d496f8e0152b
-      size: 95366513
+      md5: 78ac91c79037cdd1b15105df12e105a9
+      size: 91175265

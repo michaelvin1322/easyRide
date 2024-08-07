@@ -1,8 +1,12 @@
 import pandas as pd
 
 
-def modify_data():
-    df = pd.read_csv('data/dataset.csv')
+def modify_data(
+        prefect: bool = False,
+        df: pd.DataFrame = pd.DataFrame(),
+):
+    if not prefect:
+        df = pd.read_csv('data/dataset.csv')
 
     # Creating the new feature 'trip_duration' (in minutes)
     df['trip_duration'] = (
@@ -44,6 +48,9 @@ def modify_data():
     ]
 
     df.to_csv('data/modified_dataset.csv', index=False)
+
+    if prefect:
+        return df
 
 
 if __name__ == "__main__":

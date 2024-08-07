@@ -3,7 +3,9 @@ from sqlalchemy import create_engine
 import os
 
 
-def extract_data():
+def extract_data(
+        prefect: bool = False
+):
     # Replace the following values with your actual database credentials
     username = os.environ['POSTGRES_USERNAME']
     password = os.environ['POSTGRES_PASSWORD']
@@ -37,6 +39,9 @@ def extract_data():
     # Replace with your actual database connection details
     df = pd.read_sql(query, engine)
     df.to_csv('data/dataset.csv', index=False)
+
+    if prefect:
+        return df
 
 
 if __name__ == "__main__":

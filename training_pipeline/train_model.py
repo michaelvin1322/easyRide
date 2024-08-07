@@ -9,8 +9,12 @@ from dvclive import Live
 import pickle
 
 
-def train_model():
-    df = pd.read_csv('data/modified_dataset.csv')
+def train_model(
+        prefect: bool = False,
+        df: pd.DataFrame = pd.DataFrame()
+        ):
+    if not prefect:
+        df = pd.read_csv('data/modified_dataset.csv')
     x = df[
         [
             'trip_distance', 'puborough', 'puzone', 'puservicezone',
@@ -68,6 +72,9 @@ def train_model():
         pickle.dump(model, file)
 
     print("Model has been trained and saved as 'catboost_model.pkl'")
+
+    if prefect:
+        return model
 
 
 if __name__ == "__main__":
