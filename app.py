@@ -61,7 +61,7 @@ def predict(data: List[PredictRequest], model=Depends(get_model)) -> PredictResp
 
 
 def main():
-    uvicorn.run(app)
+    uvicorn.run(app, host="0.0.0.0")
 
 
 if __name__ == '__main__':
