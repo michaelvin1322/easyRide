@@ -17,7 +17,7 @@ jobs:
 # RUN dvc remote modify myremote --local access_key_id ${S3_ACCESS_KEY_ID}
 # RUN dvc remote modify myremote --local secret_access_key $S3_SECRET_ACCESS_KEY
       - run: dvc remote modify myremote --local access_key_id ${{ secrets.S3_ACCESS_KEY_ID }}
-      - run: dvc remote modify myremote --local secret_access_key ${{ secrets.$S3_SECRET_ACCESS_KEY }}
+      - run: dvc remote modify myremote --local secret_access_key ${{ secrets.S3_SECRET_ACCESS_KEY }}
       - run: |
           dvc pull
       - run: flyctl deploy --remote-only
