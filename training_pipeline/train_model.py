@@ -15,6 +15,7 @@ def train_model(
         ):
     if not prefect:
         df = pd.read_csv('data/modified_dataset.csv')
+
     x = df[
         [
             'trip_distance', 'puborough', 'puzone', 'puservicezone',
