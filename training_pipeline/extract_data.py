@@ -4,7 +4,7 @@ import os
 
 
 def extract_data(
-        prefect: bool = False
+        prefect: bool = False,
 ):
     # Replace the following values with your actual database credentials
     username = os.environ['POSTGRES_USERNAME']
