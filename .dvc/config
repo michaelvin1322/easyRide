@@ -1,0 +1,6 @@
+[core]
+    remote = myremote
+['remote "myremote"']
+    url = s3://lively-frost-765
+    endpointurl = https://fly.storage.tigris.dev
+    region = auto
