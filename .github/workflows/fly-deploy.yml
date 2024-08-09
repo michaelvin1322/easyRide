@@ -19,7 +19,8 @@ jobs:
       - run: dvc remote modify myremote --local access_key_id ${{ secrets.S3_ACCESS_KEY_ID }}
       - run: dvc remote modify myremote --local secret_access_key ${{ secrets.S3_SECRET_ACCESS_KEY }}
       - run: |
-          dvc pull
+          dvc pull models/catboost_model.pkl
+#          Flag to extract only the model
       - run: flyctl deploy --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
