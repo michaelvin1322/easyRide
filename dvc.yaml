@@ -12,7 +12,7 @@ stages:
     - data/dataset.csv
     - training_pipeline/modify_data.py
     outs:
-    - modes/categorical_mappings.json
+    - models/categorical_mappings.json
     - data/modified_dataset.csv
 
   train_model:

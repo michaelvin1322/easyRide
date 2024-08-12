@@ -10,14 +10,14 @@ stages:
     outs:
     - path: data/dataset.csv
       hash: md5
-      md5: a39616f295741a679f28293008263392
+      md5: 15d69aab6d62ed22e0bb920697c34654
       size: 17507396
   modify_data:
     cmd: python training_pipeline/modify_data.py
     deps:
     - path: data/dataset.csv
       hash: md5
-      md5: a39616f295741a679f28293008263392
+      md5: 15d69aab6d62ed22e0bb920697c34654
       size: 17507396
     - path: training_pipeline/modify_data.py
       hash: md5
@@ -26,14 +26,18 @@ stages:
     outs:
     - path: data/modified_dataset.csv
       hash: md5
-      md5: 5915bfeccbd15762ea1a8788d43d4dab
+      md5: 9698f5498bed46348ba8c07d12ebb7b0
       size: 2956908
+    - path: models/categorical_mappings.json
+      hash: md5
+      md5: 7218e0f1da6a0ffb6f57b1b3135e1970
+      size: 11228
   train_model:
     cmd: python training_pipeline/train_model.py
     deps:
     - path: data/modified_dataset.csv
       hash: md5
-      md5: 5915bfeccbd15762ea1a8788d43d4dab
+      md5: 9698f5498bed46348ba8c07d12ebb7b0
       size: 2956908
     - path: training_pipeline/train_model.py
       hash: md5
@@ -42,5 +46,5 @@ stages:
     outs:
     - path: models/catboost_model.pkl
       hash: md5
-      md5: 5c1e436e40850c6b84789bf851a36553
-      size: 91752621
+      md5: ffa9f007f15d32ddf49f8889c8fdee0f
+      size: 84834933
