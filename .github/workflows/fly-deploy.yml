@@ -21,7 +21,7 @@ jobs:
       - run: |
           dvc pull
 #          Flag to extract only the model
-      - run: flyctl deploy --remote-only
+      - run: flyctl deploy --remote-only --dockerfile dockerfile
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
