@@ -1,18 +1,28 @@
 import pickle
 import os
+import json
 from typing import Annotated, List
+from logger import logger
 
 import pandas as pd
 import uvicorn
-from fastapi import Body, Depends, FastAPI
+from fastapi import Body, Depends, FastAPI, HTTPException
 from sqlalchemy import create_engine
 from pydantic import BaseModel
+
+from catboost import CatBoostRegressor
+
+# Set display options to show all columns and full content
+pd.set_option('display.max_columns', None)
+pd.set_option('display.expand_frame_repr', False)
+pd.set_option('display.max_colwidth', None)
 
 app = FastAPI()
 
 
 # Define the request and response models
 class PredictRequest(BaseModel):
+    trip_id: str
     request_datetime: str
     trip_distance: float
     PULocationID: int
@@ -21,11 +31,12 @@ class PredictRequest(BaseModel):
 
 
 class PredictResponse(BaseModel):
-    prediction: List[float]
+    prediction: float
 
 
 # Load the model globally
 _model = None
+_categorical_mappings = None
 
 
 def get_db_engine():
@@ -45,19 +56,31 @@ def get_model():
     if _model is None:
         with open("models/catboost_model.pkl", "rb") as f:
             _model = pickle.load(f)
+        logger.info("Model loaded successfully")
     return _model
 
 
+def get_mapping():
+    global _categorical_mappings
+    if _categorical_mappings is None:
+        with open("models/categorical_mappings.json", "r") as f:
+            _categorical_mappings = json.load(f)
+        logger.info("Categorical mappings loaded successfully")
+    return _categorical_mappings
+
+
 @app.post("/predict")
-def predict(data: List[PredictRequest], model=Depends(get_model)) -> PredictResponse:
+def predict(data: PredictRequest, model=Depends(get_model), mappings=Depends(get_mapping), ) -> PredictResponse:
     # Convert the list of PredictRequest objects to a DataFrame
-    df = pd.DataFrame([{
-        "request_datetime": d.request_datetime,
-        "trip_distance": d.trip_distance,
-        "PULocationID": d.PULocationID,
-        "DOLocationID": d.DOLocationID,
-        "Airport": d.Airport
-    } for d in data])
+    df = pd.DataFrame({
+        "trip_id": [data.trip_id],
+        "request_datetime": [data.request_datetime],
+        "trip_distance": [data.trip_distance],
+        "PULocationID": [data.PULocationID],
+        "DOLocationID": [data.DOLocationID],
+        "Airport": [data.Airport],
+    })
+    logger.info("Converted input to DataFrame:\n%s", df)
 
     engine = get_db_engine()
 
@@ -84,6 +107,15 @@ def predict(data: List[PredictRequest], model=Depends(get_model)) -> PredictResp
     df = df.merge(pu_info_df, left_on='PULocationID', right_on='LocationID', suffixes=('', '_pu'))
     df = df.merge(do_info_df, left_on='DOLocationID', right_on='LocationID', suffixes=('', '_do'))
 
+    if pu_info_df.empty:
+        logger.error("PULocationID %s not found TripID %s", data.PULocationID, data.trip_id)
+        raise HTTPException(status_code=404, detail=f"PULocationID {data.PULocationID} not found")
+
+    # Check if the DO location is not found
+    if do_info_df.empty:
+        logger.error("DOLocationID %s not found TripID %s", data.PULocationID, data.trip_id)
+        raise HTTPException(status_code=404, detail=f"DOLocationID {data.DOLocationID} not found")
+
     df.rename(columns={
         "Borough": "puborough",
         "Zone": "puzone",
@@ -97,13 +129,14 @@ def predict(data: List[PredictRequest], model=Depends(get_model)) -> PredictResp
     df['pickup_hour'] = pd.to_datetime(df['request_datetime']).dt.hour
     df['pickup_weekday'] = pd.to_datetime(df['request_datetime']).dt.weekday
 
-    # Preserve categorical codes (ensure the codes match what was used during training)
-    df['puborough'] = df['puborough'].astype('category').cat.codes
-    df['puzone'] = df['puzone'].astype('category').cat.codes
-    df['puservicezone'] = df['puservicezone'].astype('category').cat.codes
-    df['doborough'] = df['doborough'].astype('category').cat.codes
-    df['dozone'] = df['dozone'].astype('category').cat.codes
-    df['doservicezone'] = df['doservicezone'].astype('category').cat.codes
+    categorical_columns = ['puborough', 'puzone', 'puservicezone', 'doborough', 'dozone', 'doservicezone']
+    # Map categorical features using the loaded mappings
+    for col in categorical_columns:
+        df[col] = df[col].map(mappings[col])
+
+    # Handle NaN values by assigning them the same code as during training (-1 or similar)
+    df.fillna(-1, inplace=True)
+    df[categorical_columns] = df[categorical_columns].astype(int).astype(str)
 
     # Prepare final dataframe for prediction
     df = df[[
@@ -111,13 +144,14 @@ def predict(data: List[PredictRequest], model=Depends(get_model)) -> PredictResp
         'doborough', 'dozone', 'doservicezone', 'pickup_hour',
         'pickup_weekday'
     ]]
+    logger.info("Final DataFrame for prediction:\n%s", df)
 
     # Make predictions
     prediction = model.predict(df)
+    logger.info("Prediction result: %s", prediction)
 
-    5 + 6
     # Return predictions as a list
-    return PredictResponse(prediction=prediction.tolist())
+    return PredictResponse(prediction=prediction[0])
 
 
 def main():
