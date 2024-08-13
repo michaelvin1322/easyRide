@@ -6,7 +6,7 @@ SOURCE_REPO = "https://github.com/michaelvin1322/easyRide.git"
 if __name__ == "__main__":
     flow.from_source(
         source=SOURCE_REPO,
-        entrypoint="prefect_pipeline.py:train_model_flow",  # Specific flow to run
+        entrypoint="prefect_train_pipeline.py:train_model_flow",  # Specific flow to run
     ).deploy(
         name="initial-deploy",
         work_pool_name="my-work-pool",  # Work pool target
