@@ -144,11 +144,11 @@ def predict(data: PredictRequest, model=Depends(get_model), mappings=Depends(get
         'doborough', 'dozone', 'doservicezone', 'pickup_hour',
         'pickup_weekday'
     ]]
-    logger.info("Final DataFrame for prediction:\n%s", df)
+    logger.info("Final DataFrame for prediction:\n%s", df.to_string(index=False))
 
     # Make predictions
     prediction = model.predict(df)
-    logger.info("Prediction result: %s", prediction)
+    logger.info("Prediction result:\n%s", df.to_string(index=False))
 
     # Return predictions as a list
     return PredictResponse(prediction=prediction[0])
