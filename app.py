@@ -1,16 +1,13 @@
 import pickle
-import os
 import json
-from typing import Annotated, List
 from logger import logger
 
 import pandas as pd
 import uvicorn
-from fastapi import Body, Depends, FastAPI, HTTPException
-from sqlalchemy import create_engine
+from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel
 
-from catboost import CatBoostRegressor
+from db import engine
 
 # Set display options to show all columns and full content
 pd.set_option('display.max_columns', None)
@@ -37,18 +34,6 @@ class PredictResponse(BaseModel):
 # Load the model globally
 _model = None
 _categorical_mappings = None
-
-
-def get_db_engine():
-    username = os.getenv('POSTGRES_USERNAME')
-    password = os.getenv('POSTGRES_PASSWORD')
-    host = os.getenv('POSTGRES_HOST')
-    port = os.getenv('POSTGRES_PORT')
-    database = os.getenv('POSTGRES_DATABASE')
-
-    database_url = f"postgresql://{username}:{password}@{host}:{port}/{database}"
-    engine = create_engine(database_url)
-    return engine
 
 
 def get_model():
@@ -81,8 +66,6 @@ def predict(data: PredictRequest, model=Depends(get_model), mappings=Depends(get
         "Airport": [data.Airport],
     })
     logger.info("Converted input to DataFrame:\n%s", df)
-
-    engine = get_db_engine()
 
     # Fetch the additional information based on PULocationID and DOLocationID using pd.read_sql
     pu_location_ids = df['PULocationID'].unique().tolist()
