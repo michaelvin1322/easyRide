@@ -65,6 +65,7 @@ def predict(data: PredictRequest, model=Depends(get_model), mappings=Depends(get
         "DOLocationID": [data.DOLocationID],
         "Airport": [data.Airport],
     })
+    df.set_index("trip_id")
     logger.info("Converted input to DataFrame:\n%s", df)
 
     # Fetch the additional information based on PULocationID and DOLocationID using pd.read_sql
@@ -132,6 +133,13 @@ def predict(data: PredictRequest, model=Depends(get_model), mappings=Depends(get
     # Make predictions
     prediction = model.predict(df)
     df['prediction'] = prediction
+    df['trip_id'] = [data.trip_id]
+    order = [
+        "trip_id", "trip_distance", "puborough", "puzone",
+        "puservicezone", "doborough", "dozone", "doservicezone",
+        "pickup_hour", "pickup_weekday",  "prediction",
+    ]
+    df = df[order]
     logger.info("Prediction result:\n%s", df.to_string(index=False))
 
     # Return predictions as a list
