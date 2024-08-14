@@ -131,6 +131,7 @@ def predict(data: PredictRequest, model=Depends(get_model), mappings=Depends(get
 
     # Make predictions
     prediction = model.predict(df)
+    df['prediction'] = prediction
     logger.info("Prediction result:\n%s", df.to_string(index=False))
 
     # Return predictions as a list
