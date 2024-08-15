@@ -151,9 +151,8 @@ def predict(data: PredictRequest, model=Depends(get_model), mappings=Depends(get
     df[categorical_columns] = df[categorical_columns].astype(int).astype(str)
 
     # Prepare final dataframe for prediction
-    df['trip_id'] = [data.trip_id]
     df = df[[
-        'trip_id', 'trip_distance', 'puborough', 'puzone',
+        'trip_distance', 'puborough', 'puzone',
         'puservicezone', 'doborough', 'dozone', 'doservicezone',
         'pickup_hour', 'pickup_weekday',
     ]]
