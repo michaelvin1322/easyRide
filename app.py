@@ -79,7 +79,7 @@ def predict(data: PredictRequest, model=Depends(get_model), mappings=Depends(get
         "DOLocationID": [data.DOLocationID],
         "Airport": [data.Airport],
     })
-    logger.info("Converted input to DataFrame:\n%s", df)
+    logger.info("Converted input to DataFrame:\n%s", df.to_string(index=False))
 
     # Fetch the additional information based on PULocationID and DOLocationID using pd.read_sql
     pu_location_ids = df['PULocationID'].unique().tolist()
