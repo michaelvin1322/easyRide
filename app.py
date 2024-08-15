@@ -1,6 +1,7 @@
 import pickle
 import json
-from logger import logger
+import re
+from datetime import datetime
 
 import pandas as pd
 import uvicorn
@@ -8,6 +9,7 @@ from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel
 
 from db import engine
+from logger import logger
 
 # Set display options to show all columns and full content
 pd.set_option('display.max_columns', None)
@@ -15,6 +17,14 @@ pd.set_option('display.expand_frame_repr', False)
 pd.set_option('display.max_colwidth', None)
 
 app = FastAPI()
+
+# Extend the dictionary to include datetime formats without the timezone
+allowed_date_time_formats_re = {
+    r"^\d{4}-\d{2}-\d{2}T\d{2}/\d{2}/\d{2}\+\d{4}$": '%Y-%m-%dT%H/%M/%S%z',  # Format: 2024-08-15T09/28/25+0200
+    r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{4}$": '%Y-%m-%dT%H:%M:%S%z',  # Format: 2024-08-06T14:30:00+0200
+    r"^\d{4}-\d{2}-\d{2}T\d{2}/\d{2}/\d{2}$": '%Y-%m-%dT%H/%M/%S',            # Format: 2024-08-15T09/28/25
+    r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$": '%Y-%m-%dT%H:%M:%S'             # Format: 2024-08-06T14:30:00
+}
 
 
 # Define the request and response models
@@ -65,7 +75,6 @@ def predict(data: PredictRequest, model=Depends(get_model), mappings=Depends(get
         "DOLocationID": [data.DOLocationID],
         "Airport": [data.Airport],
     })
-    df.set_index("trip_id")
     logger.info("Converted input to DataFrame:\n%s", df)
 
     # Fetch the additional information based on PULocationID and DOLocationID using pd.read_sql
@@ -109,9 +118,19 @@ def predict(data: PredictRequest, model=Depends(get_model), mappings=Depends(get
         "service_zone_do": "doservicezone"
     }, inplace=True)
 
+    parsed_datetime = None
+
+    for pattern, dt_format in allowed_date_time_formats_re.items():
+        if re.match(pattern, data.request_datetime):
+            parsed_datetime = datetime.strptime(data.request_datetime, dt_format)
+            break
+
+    if parsed_datetime is None:
+        raise HTTPException(status_code=400, detail="Invalid datetime format")
+
     # Apply the same preprocessing
-    df['pickup_hour'] = pd.to_datetime(df['request_datetime']).dt.hour
-    df['pickup_weekday'] = pd.to_datetime(df['request_datetime']).dt.weekday
+    df['pickup_hour'] = parsed_datetime.hour
+    df['pickup_weekday'] = parsed_datetime.weekday()
 
     categorical_columns = ['puborough', 'puzone', 'puservicezone', 'doborough', 'dozone', 'doservicezone']
     # Map categorical features using the loaded mappings
