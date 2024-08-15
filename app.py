@@ -82,7 +82,9 @@ def predict(data: PredictRequest, model=Depends(get_model), mappings=Depends(get
     if data.trip_distance < 0:
         raise HTTPException(status_code=400, detail="Trip distance cannot be negative")
 
-    logger.info("Converted input to DataFrame:\n%s", df.to_string(index=False))
+    df_string = df.to_string(index=False, header=True)
+    # Log the result
+    logger.info("Converted input to DataFrame:\n%s", df_string)
 
     # Fetch the additional information based on PULocationID and DOLocationID using pd.read_sql
     pu_location_ids = df['PULocationID'].unique().tolist()
@@ -155,7 +157,10 @@ def predict(data: PredictRequest, model=Depends(get_model), mappings=Depends(get
         'puservicezone', 'doborough', 'dozone', 'doservicezone',
         'pickup_hour', 'pickup_weekday',
     ]]
-    logger.info("Final DataFrame for prediction:\n%s", df.to_string(index=False))
+
+    df_string = df.to_string(index=False, header=True)
+    # Log the result
+    logger.info("Final DataFrame for prediction:\n%s", df_string)
 
     # Make predictions
     prediction = model.predict(df)
@@ -167,7 +172,11 @@ def predict(data: PredictRequest, model=Depends(get_model), mappings=Depends(get
         "pickup_hour", "pickup_weekday",  "prediction",
     ]
     df = df[order]
-    logger.info("Prediction result:\n%s", df.to_string(index=False))
+
+    # Convert the DataFrame to a string without breaking it into separate log statements
+    df_string = df.to_string(index=False, header=True)
+    # Log the result
+    logger.info("Prediction result:\n%s", df_string)
 
     # Return predictions as a list
     return PredictResponse(prediction=prediction[0])
