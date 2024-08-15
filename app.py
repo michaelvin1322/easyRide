@@ -18,12 +18,16 @@ pd.set_option('display.max_colwidth', None)
 
 app = FastAPI()
 
-# Extend the dictionary to include datetime formats without the timezone
+# Extend the dictionary to include datetime formats without the timezone and with a space between date and time
 allowed_date_time_formats_re = {
-    r"^\d{4}-\d{2}-\d{2}T\d{2}/\d{2}/\d{2}\+\d{4}$": '%Y-%m-%dT%H/%M/%S%z',  # Format: 2024-08-15T09/28/25+0200
-    r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{4}$": '%Y-%m-%dT%H:%M:%S%z',  # Format: 2024-08-06T14:30:00+0200
-    r"^\d{4}-\d{2}-\d{2}T\d{2}/\d{2}/\d{2}$": '%Y-%m-%dT%H/%M/%S',            # Format: 2024-08-15T09/28/25
-    r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$": '%Y-%m-%dT%H:%M:%S'             # Format: 2024-08-06T14:30:00
+    r"^\d{4}-\d{2}-\d{2} \d{2}/\d{2}/\d{2}\+\d{2}:\d{2}$": '%Y-%m-%d %H/%M/%S%z',  # Format: 2024-08-15 09/28/25+02:00
+    r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\+\d{2}:\d{2}$": '%Y-%m-%d %H:%M:%S%z',  # Format: 2024-08-06 14:30:00+02:00
+    r"^\d{4}-\d{2}-\d{2}T\d{2}/\d{2}/\d{2}\+\d{4}$": '%Y-%m-%dT%H/%M/%S%z',        # Format: 2024-08-15T09/28/25+0200
+    r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{4}$": '%Y-%m-%dT%H:%M:%S%z',        # Format: 2024-08-06T14:30:00+0200
+    r"^\d{4}-\d{2}-\d{2} \d{2}/\d{2}/\d{2}$": '%Y-%m-%d %H/%M/%S',                 # Format: 2024-08-15 09/28/25
+    r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$": '%Y-%m-%d %H:%M:%S',                 # Format: 2024-08-06 14:30:00
+    r"^\d{4}-\d{2}-\d{2}T\d{2}/\d{2}/\d{2}$": '%Y-%m-%dT%H/%M/%S',                 # Format: 2024-08-15T09/28/25
+    r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$": '%Y-%m-%dT%H:%M:%S'                  # Format: 2024-08-06T14:30:00
 }
 
 
